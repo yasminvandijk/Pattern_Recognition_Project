@@ -3,6 +3,9 @@ import tensorflow as tf
 from tensorflow.keras import datasets, layers, models
 import matplotlib.pyplot as plt
 import SqueezeNet
+import DataLoad
+
+(X,Y) = DataLoad.load_data()
 
 # import Cifar dataset
 (train_images, train_labels), (test_images, test_labels) = datasets.cifar10.load_data()

@@ -34,25 +34,26 @@ import glob
 
 
 def get_class(img_path):
-    print(img_path)
     return int(img_path.split(os.sep)[-2])
 
-root_dir = 'GTSRB'+os.sep+'Final_Training'+os.sep+'Images'+os.sep
+def load_data():
+    root_dir = 'GTSRB' + os.sep + 'Final_Training' + os.sep + 'Images' + os.sep
 
-imgs = []
-labels = []
+    imgs = []
+    labels = []
 
-all_img_paths = glob.glob(os.path.join(root_dir, '*/*.ppm'))
+    all_img_paths = glob.glob(os.path.join(root_dir, '*/*.ppm'))
 
+    np.random.shuffle(all_img_paths)
+    for img_path in all_img_paths:
+        img = preprocess_img(io.imread(img_path))
+        label = get_class(img_path)
+        imgs.append(img)
+        labels.append(label)
 
-np.random.shuffle(all_img_paths)
-for img_path in all_img_paths:
-    img = preprocess_img(io.imread(img_path))
-    label = get_class(img_path)
-    imgs.append(img)
-    labels.append(label)
+    X = np.array(imgs, dtype='float32')
+    # Make one hot targets
+    Y = np.eye(NUM_CLASSES, dtype='uint8')[labels]
 
-X = np.array(imgs, dtype='float32')
-# Make one hot targets
-Y = np.eye(NUM_CLASSES, dtype='uint8')[labels]
+    return (X,Y)
 
