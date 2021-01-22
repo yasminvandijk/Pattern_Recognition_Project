@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import SqueezeNet
 import DataLoad
 
-(X,Y) = DataLoad.load_data()
-X = X / 255.0
+(X,Y) = DataLoad.load_data() #loads in the images and puts them in a tupple where X is the image and Y the label, only training images
+X = X / 255.0 #normalizing the pixel values.
 
 #(train_images, train_labels), (test_images, test_labels) = datasets.cifar10.load_data()
 
@@ -17,7 +17,7 @@ X = X / 255.0
 #               'dog', 'frog', 'horse', 'ship', 'truck']
 
 # Create the model. Give the dimensions of the input data as parameter
-model = SqueezeNet.SqueezeNet(43, inputs=(48, 48, 3))
+model = SqueezeNet.SqueezeNet(43, inputs=(48, 48, 3)) #43 is number of classes, 48 by 48 is the image size, original was 32,32,3 and 10 classes
 
 # Compile and train the model
 model.compile(optimizer='adam',
@@ -27,9 +27,9 @@ model.compile(optimizer='adam',
 history = model.fit(
                 X,
                 Y,
-                epochs=2,
-                steps_per_epoch=200)
-                #validation_data=(test_images, test_labels))
+                epochs=2, #this was 4, made it smaller
+                steps_per_epoch=200) #this was 400
+                #validation_data=(test_images, test_labels)) #validation set it not yet loaded in
 
 
 # Evaluate the model
