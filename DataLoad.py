@@ -34,13 +34,17 @@ import glob
 
 
 def get_class(img_path):
-    return int(img_path.split('/')[-2])
+    print(img_path)
+    return int(img_path.split(os.sep)[-2])
 
-root_dir = 'GTSRB/Final_Training/Images/'
+root_dir = 'GTSRB'+os.sep+'Final_Training'+os.sep+'Images'+os.sep
+
 imgs = []
 labels = []
 
 all_img_paths = glob.glob(os.path.join(root_dir, '*/*.ppm'))
+
+
 np.random.shuffle(all_img_paths)
 for img_path in all_img_paths:
     img = preprocess_img(io.imread(img_path))
@@ -51,3 +55,4 @@ for img_path in all_img_paths:
 X = np.array(imgs, dtype='float32')
 # Make one hot targets
 Y = np.eye(NUM_CLASSES, dtype='uint8')[labels]
+
