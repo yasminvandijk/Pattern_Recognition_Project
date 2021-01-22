@@ -20,7 +20,7 @@ train_images, test_images = train_images / 255.0, test_images / 255.0
 
 class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                'dog', 'frog', 'horse', 'ship', 'truck']
-               
+
 
 model = SqueezeNet.SqueezeNet(10, inputs=(3, 32, 32))
 
