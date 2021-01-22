@@ -1,19 +1,14 @@
 import tensorflow as tf
 
-from numpy import moveaxis
-
 from tensorflow.keras import datasets, layers, models
 import matplotlib.pyplot as plt
 import SqueezeNet
+import DataLoad
+
+(X,Y) = DataLoad.load_data()
 
 # import Cifar dataset
 (train_images, train_labels), (test_images, test_labels) = datasets.cifar10.load_data()
-
-# Reshape dataset
-print(train_images.shape)
-train_images = moveaxis(train_images, 3, 1)
-test_images = moveaxis(test_images, 3, 1)
-print(train_images.shape)
 
 # Normalize pixel values to be between 0 and 1
 train_images, test_images = train_images / 255.0, test_images / 255.0
@@ -21,16 +16,21 @@ train_images, test_images = train_images / 255.0, test_images / 255.0
 class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                'dog', 'frog', 'horse', 'ship', 'truck']
 
-
-model = SqueezeNet.SqueezeNet(10, inputs=(3, 32, 32))
+# Create the model. Give the dimensions of the input data as parameter
+model = SqueezeNet.SqueezeNet(10, inputs=(32, 32, 3))
 
 # Compile and train the model
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
-history = model.fit(train_images, train_labels, epochs=4,
-                    validation_data=(test_images, test_labels))
+history = model.fit(
+                train_images,
+                train_labels,
+                epochs=4,
+                steps_per_epoch=400,
+                validation_data=(test_images, test_labels))
+
 
 # Evaluate the model
 plt.plot(history.history['accuracy'], label='accuracy')
