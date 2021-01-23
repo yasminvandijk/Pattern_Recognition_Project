@@ -5,31 +5,29 @@ import matplotlib.pyplot as plt
 import SqueezeNet
 import DataLoad
 
-(X,Y) = DataLoad.load_data() #loads in the images and puts them in a tupple where X is the image and Y the label, only training images
-X = X / 255.0 #normalizing the pixel values.
+from numpy import moveaxis
 
-#(train_images, train_labels), (test_images, test_labels) = datasets.cifar10.load_data()
+(X,Y) = DataLoad.load_data()  # loads in the images and puts them in a tupple where X is the image and Y the label, only training images
+X = X / 255.0  # normalizing the pixel values.
 
-# Normalize pixel values to be between 0 and 1
-#train_images, test_images = train_images / 255.0, test_images / 255.0
-
-#class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
-#               'dog', 'frog', 'horse', 'ship', 'truck']
+# Reshape data dimensions from (3, 48, 48) to (48, 48, 3)
+X = moveaxis(X, 1, 3)
 
 # Create the model. Give the dimensions of the input data as parameter
-model = SqueezeNet.SqueezeNet(43, inputs=(48, 48, 3)) #43 is number of classes, 48 by 48 is the image size, original was 32,32,3 and 10 classes
+model = SqueezeNet.SqueezeNet(43, inputs=(48, 48, 3))  # 43 is number of classes, 48 by 48 is the image size
 
 # Compile and train the model
 model.compile(optimizer='adam',
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              loss='categorical_crossentropy',
               metrics=['accuracy'])
 
 history = model.fit(
                 X,
                 Y,
-                epochs=2, #this was 4, made it smaller
-                steps_per_epoch=200) #this was 400
-                #validation_data=(test_images, test_labels)) #validation set it not yet loaded in
+                epochs=2,  # this was 4, made it smaller
+                steps_per_epoch=200,  # this was 400
+                validation_split=0.33)  # we can remove this after we added the test data
+                # validation_data=(test_images, test_labels))  # we can add this after we added the test data
 
 
 # Evaluate the model
