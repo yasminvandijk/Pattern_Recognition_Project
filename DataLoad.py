@@ -1,6 +1,7 @@
 #Load in data
 import numpy as np
 from skimage import color, exposure, transform
+import pandas as pd
 
 NUM_CLASSES = 43
 IMG_SIZE = 48
@@ -56,4 +57,23 @@ def load_data():
     Y = np.eye(NUM_CLASSES, dtype='uint8')[labels]
 
     return (X,Y)
+
+def load_test_data():
+
+    test = pd.read_csv('Test.csv', sep=',')
+
+    # Load test dataset
+    X_test = []
+    Y_test = []
+    i = 0
+    for file_name, class_id in zip(list(test['Path']), list(test['ClassId'])):
+        img_path = os.path.join('GTSRB/Final_Test/', file_name)
+        X_test.append(preprocess_img(io.imread(img_path)))
+        Y_test.append(class_id)
+
+    X_test = np.array(X_test)
+    Y_test = np.array(Y_test)
+
+    return (X_test, Y_test)
+
 
