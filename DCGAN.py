@@ -119,7 +119,7 @@ checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
 
 
 ##define training
-EPOCHS = 50
+EPOCHS = 10
 noise_dim = 100
 num_examples_to_generate = 16
 
@@ -193,9 +193,7 @@ def generate_and_save_images(model, epoch, test_input):
 train(train_dataset, EPOCHS)
 checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
-
-
-
+ 
 #### create a gif
 # Display a single image using the epoch number
 def display_image(epoch_no):
