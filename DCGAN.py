@@ -16,12 +16,12 @@ from IPython import display
 import CNN
 
 #import mnist dataset, to test the GAN
-# (train_images, train_labels), (_, _) = tf.keras.datasets.mnist.load_data()
-# train_images = train_images.reshape(train_images.shape[0], 28, 28, 1).astype('float32')
-# train_images = (train_images - 127.5) / 127.5 # Normalize the images to [-1, 1]
+(train_images, train_labels), (_, _) = tf.keras.datasets.mnist.load_data()
+train_images = train_images.reshape(train_images.shape[0], 28, 28, 1).astype('float32')
+train_images = (train_images - 127.5) / 127.5 # Normalize the images to [-1, 1]
 
-train_images = CNN.train_images
-train_labels = CNN.train_labels
+# train_images = CNN.train_images
+# train_labels = CNN.train_labels
 
 
 BUFFER_SIZE = 60000
@@ -31,22 +31,77 @@ BATCH_SIZE = 256
 train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 
 ##Make the generator
+# def make_generator_model():
+#     model = tf.keras.Sequential()
+#     model.add(layers.Dense(12*12*256, use_bias=False, input_shape=(100,)))
+#     model.add(layers.BatchNormalization())
+#     model.add(layers.LeakyReLU())
+#
+#     model.add(layers.Reshape((12, 12, 256)))
+#     assert model.output_shape == (None, 12, 12, 256) # Note: None is the batch size #12 was 7
+#
+#     model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
+#     assert model.output_shape == (None, 12, 12, 128) #12 was 7
+#     model.add(layers.BatchNormalization())
+#     model.add(layers.LeakyReLU())
+#
+#     model.add(layers.Conv2DTranspose(64, (5, 5), strides=(2, 2), padding='same', use_bias=False))
+#     assert model.output_shape == (None, 24, 24, 64) #24 was 14
+#     model.add(layers.BatchNormalization())
+#     model.add(layers.LeakyReLU())
+#
+#     # model.add(layers.Conv2DTranspose(32, (5, 5), strides=(2, 2), padding='same', use_bias=False))
+#     # assert model.output_shape == (None, 28, 28, 32) #24 was 14
+#     # model.add(layers.BatchNormalization())
+#     # model.add(layers.LeakyReLU())
+#
+#     model.add(layers.Conv2DTranspose(3, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
+#     assert model.output_shape == (None, 48, 48, 3) #was (None, 28, 28, 1)
+#
+#     return model
+#
+# ##use untrained generator to make an image
+# generator = make_generator_model()
+#
+# noise = tf.random.normal([1, 100])
+# generated_image = generator(noise, training=False)
+#
+# plt.imshow(generated_image[0, :, :, 0]) #, cmap='gray'
+#
+# ##create an discriminator
+# def make_discriminator_model():
+#     model = tf.keras.Sequential()
+#     model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same',
+#                                      input_shape=[48, 48, 3]))
+#     model.add(layers.LeakyReLU())
+#     model.add(layers.Dropout(0.3))
+#
+#     model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
+#     model.add(layers.LeakyReLU())
+#     model.add(layers.Dropout(0.3))
+#
+#     model.add(layers.Flatten())
+#     model.add(layers.Dense(1))
+#
+#     return model
+
+####model for mnist -------------------------------------------------
 def make_generator_model():
     model = tf.keras.Sequential()
-    model.add(layers.Dense(12*12*256, use_bias=False, input_shape=(100,)))
+    model.add(layers.Dense(7*7*256, use_bias=False, input_shape=(100,)))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
-    model.add(layers.Reshape((12, 12, 256)))
-    assert model.output_shape == (None, 12, 12, 256) # Note: None is the batch size #12 was 7
+    model.add(layers.Reshape((7, 7, 256)))
+    assert model.output_shape == (None, 7, 7, 256) # Note: None is the batch size #12 was 7
 
     model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
-    assert model.output_shape == (None, 12, 12, 128) #12 was 7
+    assert model.output_shape == (None, 7, 7, 128) #12 was 7
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
     model.add(layers.Conv2DTranspose(64, (5, 5), strides=(2, 2), padding='same', use_bias=False))
-    assert model.output_shape == (None, 24, 24, 64) #24 was 14
+    assert model.output_shape == (None, 14, 14, 64) #24 was 14
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
@@ -55,8 +110,8 @@ def make_generator_model():
     # model.add(layers.BatchNormalization())
     # model.add(layers.LeakyReLU())
 
-    model.add(layers.Conv2DTranspose(3, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
-    assert model.output_shape == (None, 48, 48, 3) #was (None, 28, 28, 1)
+    model.add(layers.Conv2DTranspose(1, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
+    assert model.output_shape == (None, 28, 28, 1) #was (None, 28, 28, 1)
 
     return model
 
@@ -72,7 +127,7 @@ plt.imshow(generated_image[0, :, :, 0]) #, cmap='gray'
 def make_discriminator_model():
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same',
-                                     input_shape=[48, 48, 3]))
+                                     input_shape=[28, 28, 1]))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
 
@@ -84,6 +139,7 @@ def make_discriminator_model():
     model.add(layers.Dense(1))
 
     return model
+#-------------------------------------------------------------
 
 #set the untrained discriminator to classify images as real or fake
 discriminator = make_discriminator_model()
@@ -193,7 +249,7 @@ def generate_and_save_images(model, epoch, test_input):
 train(train_dataset, EPOCHS)
 checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
- 
+
 #### create a gif
 # Display a single image using the epoch number
 def display_image(epoch_no):

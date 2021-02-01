@@ -1,0 +1,144 @@
+#Load in data
+import numpy as np
+from skimage import color, exposure, transform
+import pandas as pd
+# Random Rotations
+from matplotlib import pyplot
+from tensorflow.keras import layers, models
+from keras.preprocessing.image import ImageDataGenerator
+import tensorflow as tf
+import CNN
+
+train_images = CNN.train_images
+train_labels = CNN.train_labels
+test_images = CNN.test_images
+test_labels = CNN.test_labels
+
+#visualize data
+
+def visualize_data(images, categories):
+    fig = pyplot.figure(figsize=(14, 6))
+    fig.patch.set_facecolor('white')
+    for i in range(3 * 7):
+        pyplot.subplot(3, 7, i+1)
+        pyplot.xticks([])
+        pyplot.yticks([])
+        pyplot.imshow(images[i])
+    pyplot.show()
+
+#define data augmentation for SHIFT --------------------------------
+width_shift = 0.2
+height_shift = 0.2
+
+##shift generation function
+datagen_shift = ImageDataGenerator(
+    width_shift_range=width_shift,
+    height_shift_range=height_shift,
+    )
+
+datagen_shift.fit(train_images)
+
+it = datagen_shift.flow(train_images, train_labels, shuffle=False)
+batch_images, batch_labels = next(it)
+visualize_data(batch_images, batch_labels)
+
+#train with augmented  data
+m_aug = CNN.cnn_model()
+datagen_shift.fit(train_images)
+
+batch_size = 32
+epochs = 50
+
+history_aug_shift = m_aug.fit(
+    datagen_shift.flow(train_images, train_labels, batch_size=batch_size),
+    epochs=epochs,
+    validation_data=(test_images, test_labels))
+loss_aug, acc_aug = m_aug.evaluate(test_images,  test_labels)
+
+##data augmentation for ZOOM -----------------------------------------
+datagen_zoom = ImageDataGenerator(
+    zoom_range=0.5,
+    )
+
+datagen_zoom.fit(train_images)
+
+it = datagen_zoom.flow(train_images, train_labels, shuffle=False)
+batch_images, batch_labels = next(it)
+visualize_data(batch_images, batch_labels)
+
+#train with augmented zoom data
+m_aug = CNN.cnn_model()
+datagen_zoom.fit(train_images)
+
+batch_size = 32
+epochs = 50
+
+history_aug_zoom = m_aug.fit(
+    datagen_zoom.flow(train_images, train_labels, batch_size=batch_size),
+    epochs=epochs,
+    validation_data=(test_images, test_labels))
+loss_aug, acc_aug = m_aug.evaluate(test_images,  test_labels)
+
+
+##data augmentation for ROTATE -----------------------------------------
+datagen_rotate = ImageDataGenerator(
+    zoom_range=0.5,
+    )
+
+datagen_rotate.fit(train_images)
+
+it = datagen_rotate.flow(train_images, train_labels, shuffle=False)
+batch_images, batch_labels = next(it)
+visualize_data(batch_images, batch_labels)
+
+#train with augmented zoom data
+m_aug = CNN.cnn_model()
+datagen_rotate.fit(train_images)
+
+batch_size = 32
+epochs = 50
+
+history_aug_rotate = m_aug.fit(
+    datagen_rotate.flow(train_images, train_labels, batch_size=batch_size),
+    epochs=epochs,
+    validation_data=(test_images, test_labels))
+loss_aug, acc_aug = m_aug.evaluate(test_images,  test_labels)
+
+
+##results
+fig = pyplot.figure()
+fig.patch.set_facecolor('white')
+
+pyplot.plot(history_aug_zoom.history['accuracy'],
+         label='train accuracy augmented',
+         c='orange', ls='-')
+pyplot.plot(history_aug_zoom.history['val_accuracy'],
+         label='test accuracy augmented',
+         c='orange',ls='--')
+
+pyplot.plot(history_aug_shift.history['accuracy'],
+         label='train accuracy',
+         c='dodgerblue', ls='-')
+pyplot.plot(history_aug_shift.history['val_accuracy'],
+         label='test accuracy',
+         c='dodgerblue', ls='--')
+
+pyplot.plot(history_aug_rotate.history['accuracy'],
+         label='train accuracy',
+         c='dodgerblue', ls='-')
+pyplot.plot(history_aug_rotate.history['val_accuracy'],
+         label='test accuracy',
+         c='dodgerblue', ls='--')
+
+pyplot.plot(CNN.history_no_aug.history['accuracy'],
+         label='train accuracy',
+         c='dodgerblue', ls='-')
+pyplot.plot(CNN.history_no_aug.history['val_accuracy'],
+         label='test accuracy',
+         c='dodgerblue', ls='--')
+
+pyplot.xlabel('Epoch')
+pyplot.ylabel('Accuracy')
+pyplot.legend(loc='lower right')
+pyplot.show()
+
