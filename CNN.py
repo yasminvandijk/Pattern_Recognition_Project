@@ -2,8 +2,6 @@
 from tensorflow.keras import layers, models
 import matplotlib.pyplot as pyplot
 
-from keras.preprocessing.image import ImageDataGenerator
-
 # Load in the images and put them in a tuple where X is the image and Y the label
 import DataLoad
 (X, Y) = DataLoad.load_data()
@@ -58,13 +56,6 @@ loss_no_aug, acc_no_aug = m_no_aug.evaluate(test_images,  test_labels)
 fig = pyplot.figure()
 fig.patch.set_facecolor('white')
 
-pyplot.plot(history_aug.history['accuracy'],
-         label='train accuracy augmented',
-         c='orange', ls='-')
-pyplot.plot(history_aug.history['val_accuracy'],
-         label='test accuracy augmented',
-         c='orange',ls='--')
-
 pyplot.plot(history_no_aug.history['accuracy'],
          label='train accuracy',
          c='dodgerblue', ls='-')
@@ -80,13 +71,6 @@ pyplot.show()
 ##loss results
 fig = pyplot.figure()
 fig.patch.set_facecolor('white')
-
-pyplot.plot(history_aug.history['loss'],
-         label='train loss augmented',
-         c='orange', ls='-')
-pyplot.plot(history_aug.history['val_loss'],
-         label='test loss augmented',
-         c='orange',ls='--')
 
 pyplot.plot(history_no_aug.history['loss'],
          label='train loss',
