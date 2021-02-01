@@ -99,7 +99,7 @@ loss_aug, acc_aug = m_aug.evaluate(test_images,  test_labels)
 
 ##data augmentation for ROTATE -----------------------------------------
 datagen_rotate = ImageDataGenerator(
-    zoom_range=0.5,
+    rotation_range= 45.,
     )
 
 datagen_rotate.fit(train_images)
